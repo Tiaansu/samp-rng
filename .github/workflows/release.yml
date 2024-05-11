@@ -14,11 +14,16 @@ jobs:
     name: Windows Release
     runs-on: 'windows-latest'
 
+    strategy:
+      matrix:
+        include:
+          - rust: stable-i686
+
     steps:
     - uses: actions/checkout@v1
 
     - name: Install Rust (rustup)
-      run: rustup update stable-1686 --no-self-update && rustup default stable-1686
+      run: rustup update ${{ matrix.rust}} --no-self-update && rustup default ${{ matrix.rust}}
       shell: bash
 
     - name: Build
