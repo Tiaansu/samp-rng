@@ -12,7 +12,7 @@ env:
 
 jobs:
   build:
-    name: Build release
+    name: Build
     
     runs-on: ${{ matrix.os }}
     strategy:

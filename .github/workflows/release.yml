@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  release:
+    types:
+      - created
+
+env:
+  RELEASE_BIN: samp_rng
+  RELEASE_ADDS: ./include/samp_rng.inc
+
+jobs:
+  build-windows:
+    name: Windows Release
+    runs-on: 'windows-latest'
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install Rust (rustup)
+      run: rustup update stable-1686 --no-self-update && rustup default stable-1686
+      shell: bash
+
+    - name: Build
+      run: cargo build --verbose --release
+
+    - name: Create artifact directory
+      run: mkdir artifacts
+
+    - name: Create archive for Windows
+      run: 7z a -tzip ./artifacts/${{ env.RELEASE_BIN }}-windows-x86.zip ./target_release/${{ env.RELEASE_BIN }}.dll ${{ env.RELEASE_ADDS }}
+      if: runner.os == 'windows-latest'
+
+    - uses: actions/upload-artifact@v1
+      name: Upload archive
+      with:
+        name: ${{ runner.os }}
+        path: artifacts/
+
+    - uses: Upload to release
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: artifacts/windows-latest/samp-rng-windows-x86.zip
+        asset_content_type: application/gzip
