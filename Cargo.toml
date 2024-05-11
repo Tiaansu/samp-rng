@@ -1,13 +1,15 @@
 [package]
 name = "rng"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 authors = ["Tiaansu <dev.marlon.cabading@gmail.com>"]
 
 [lib]
 name = "samp_rng"
-crate-type = ["cdylib"]
+crate-type = ["dylib"]
 
 [dependencies]
 samp = {git="https://github.com/Pycckue-Bnepeg/samp-rs"}
 rand = "0.8.5"
+log = "0.4.6"
+fern = "0.5.7"

@@ -1,37 +1,8 @@
-use samp::prelude::*;
-use samp::{native, initialize_plugin};
-use rand::prelude::*;
+mod natives;
+mod plugin;
 
-struct SampRng;
-
-impl SampPlugin for SampRng {
-    fn on_load(&mut self) {
-        println!("samp rng loaded.")
-    }
-}
-
-impl SampRng {
-    #[native(name = "RandomNumber")]
-    fn random_number(&mut self, _amx: &Amx) -> AmxResult<i32> {
-        let mut rng = thread_rng();
-        let num: i32 = rng.gen();
-        Ok(num)
-    }
-
-    #[native(name = "RandomNumberMax")]
-    fn random_number_max(&mut self, _amx: &Amx, max: i32) -> AmxResult<i32> {
-        let mut rng = thread_rng();
-        let num: i32 = rng.gen_range(0..=max);
-        Ok(num)
-    }
-
-    #[native(name = "RandomNumberMinMax")]
-    fn random_number_min_max(&mut self, _amx: &Amx, min: i32, max: i32) -> AmxResult<i32> {
-        let mut rng = thread_rng();
-        let num: i32 = rng.gen_range(min..=max);
-        Ok(num)
-    }
-}
+use plugin::SampRng;
+use samp::initialize_plugin;
 
 initialize_plugin!(
     natives: [
@@ -40,7 +11,16 @@ initialize_plugin!(
         SampRng::random_number_min_max
     ],
     {
-        let plugin = SampRng;
-        return plugin;
+        let samp_logger = samp::plugin::logger()
+            .level(log::LevelFilter::Info);
+
+        let _ = fern::Dispatch::new()
+            .format(|callback, message, record| {
+                callback.finish(format_args!("[SampRng] [{}]: {}", record.level().to_string().to_lowercase(), message))
+            })
+            .chain(samp_logger)
+            .apply();
+
+        SampRng {}
     }
 );
