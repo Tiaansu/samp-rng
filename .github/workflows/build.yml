@@ -8,7 +8,7 @@ on:
 
 env:
   RELEASE_BIN: samp_rng
-  RELEASE_ADDS: samp_bcrypt.inc
+  RELEASE_ADDS: include/samp_bcrypt.inc
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
         build: [linux, windows]
         include:
           - build: linux
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             rust: stable-i686
           - build: windows
             os: windows-latest
@@ -33,7 +33,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install gcc-multilib -y
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-20.04'
 
     - name: Install Rust (rustup)
       run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
@@ -47,10 +47,10 @@ jobs:
 
     - name: Create archive for Linux
       run: 7z a -ttar -so -an ./target/release/lib${{ env.RELEASE_BIN }}.so ${{ env.RELEASE_ADDS }} | 7z a -si ./artifacts/${{ env.RELEASE_BIN }}-linux-x86.tar.gz
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-20.04'
 
     - name: Create archive for Windows
-      run: 7z a -tzip ./artifacts${{ env.RELEASE_BIN }}-windows-x86.zip ./target/release/${{ env.RELEASE_BIN }}.dll ${{ env.RELEASE_ADDS }}
+      run: 7z a -tzip ./artifacts/${{ env.RELEASE_BIN }}-windows-x86.zip ./target/release/${{ env.RELEASE_BIN }}.dll ${{ env.RELEASE_ADDS }}
       if: matrix.os == 'windows-latest'
 
     - uses: actions/upload-artifact@v1
