@@ -34,11 +34,17 @@ jobs:
       run: |
         sudo apt update
         sudo apt install gcc-multilib -y
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-22.04'
 
-    - name: Install Rust (rustup)
+    - name: Install Rust (rustup) (Linux)
       run: rustup target add ${{ matrix.rust }}
       shell: bash
+      if: matrix.os == 'ubuntu-22.04'
+
+    - name: Install Rust (rustup) (Windows)
+      run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+      shell: bash
+      if: matrix.os == 'windows-latest'
 
     - name: Build
       run: cargo build --release
@@ -47,8 +53,8 @@ jobs:
       run: mkdir artifacts
 
     - name: Create archive for Linux
-      run: 7z a -ttar -so -an ./target/release/lib${{ env.RELEASE_BIN }}.so ${{ env.RELEASE_ADDS }} | 7z a -si ./artifacts/${{ env.RELEASE_BIN }}-linux-x86.tar.gz
-      if: matrix.os == 'ubuntu-20.04'
+      run: 7z a -ttar -so -an ./target/${{ matrix.rust }}/release/lib${{ env.RELEASE_BIN }}.so ${{ env.RELEASE_ADDS }} | 7z a -si ./artifacts/${{ env.RELEASE_BIN }}-linux-x86.tar.gz
+      if: matrix.os == 'ubuntu-22.04'
 
     - name: Create archive for Windows
       run: 7z a -tzip ./artifacts/${{ env.RELEASE_BIN }}-windows-x86.zip ./target/release/${{ env.RELEASE_BIN }}.dll ${{ env.RELEASE_ADDS }}
