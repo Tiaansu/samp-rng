@@ -22,7 +22,7 @@ jobs:
         include:
           - build: linux
             os: ubuntu-22.04
-            rust: i686-unknown-linux-gnu
+            rust: stable-i686
           - build: windows
             os: windows-latest
             rust: stable-i686
