@@ -12,56 +12,62 @@ env:
   RELEASE_ADDS: ./include/samp_rng.inc
 
 jobs:
-  build:
-    name: Build
-    
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        build: [linux, windows]
-        include:
-          - build: linux
-            os: ubuntu-22.04
-            rust: i686-unknown-linux-gnu
-          - build: windows
-            os: windows-latest
-            rust: stable-i686
-
+  build-windows:
+    runs-on: windows-latest
+    env:
+      RUST: stable-i686
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
-    - name: Install gcc-multilib
-      run: |
-        sudo apt update
-        sudo apt install gcc-multilib -y
-      if: matrix.os == 'ubuntu-22.04'
+      - name: Install Rust (rustup)
+        run: rustup update ${{ env.RUST }} --no-self-update && rustup default ${{ env.RUST }}
 
-    - name: Install Rust (rustup) (Linux)
-      run: rustup target add ${{ matrix.rust }}
-      shell: bash
-      if: matrix.os == 'ubuntu-22.04'
+      - name: Build
+        run: cargo build --release
 
-    - name: Install Rust (rustup) (Windows)
-      run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
-      shell: bash
-      if: matrix.os == 'windows-latest'
+      - name: Create artifacts directory
+        run: |
+          mkdir artifacts/plugins
+          mkdir artifacts/pawno/include
 
-    - name: Build
-      run: cargo build --release
+      - name: Copy files to artifacts directory
+        run: |
+          cp .\target\release\${{ env.RELEASE_BIN }}.dll .\artifacts\plugins\${{ env.RELEASE_BIN }}.dll
+          cp .\${{ env.RELEASE_ADDS }} .\artifacts\pawno\include\${{ env.RELEASE_ADDS }}
 
-    - name: Create artifact directory
-      run: mkdir artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: samp_rng-windows
+          path: artifacts/
+          
+  build-linux:
+    runs-on: ubuntu-latest
+    env:
+      RUST: i686-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Create archive for Linux
-      run: 7z a -ttar -so -an ./target/${{ matrix.rust }}/release/lib${{ env.RELEASE_BIN }}.so ${{ env.RELEASE_ADDS }} | 7z a -si ./artifacts/${{ env.RELEASE_BIN }}-linux-x86.tar.gz
-      if: matrix.os == 'ubuntu-22.04'
+      - name: Build using Docker
+        shell: bash
+        run: |
+          cd docker
+          chmod +x ./build.sh
+          chmod +x ./docker-entrypoint.sh
+          ./build.sh
 
-    - name: Create archive for Windows
-      run: 7z a -tzip ./artifacts/${{ env.RELEASE_BIN }}-windows-x86.zip ./target/release/${{ env.RELEASE_BIN }}.dll ${{ env.RELEASE_ADDS }}
-      if: matrix.os == 'windows-latest'
+      - name: Create artifacts directory
+        run: |
+          mkdir -p artifacts/plugins
+          mkdir -p artifacts/pawno/include
 
-    - uses: actions/upload-artifact@v4
-      name: Upload archive
-      with:
-        name: ${{ runner.os }}
-        path: artifacts/
+      - name: Copy files to artifacts directory
+        run: |
+          cp target/${{ env.RUST }}/release/lib${{ env.RELEASE_BIN }}.so artifacts/plugins/${{ env.RELEASE_BIN }}.so
+          cp ${{ env.RELEASE_ADDS }} artifacts/pawno/include/${{ env.RELEASE_ADDS }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: samp_rng-linux
+          path: artifacts/
