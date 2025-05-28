@@ -9,7 +9,7 @@ on:
 
 env:
   RELEASE_BIN: samp_rng
-  RELEASE_ADDS: ./include/samp_rng.inc
+  RELEASE_ADDS: samp_rng.inc
 
 jobs:
   build-windows:
