@@ -6,6 +6,16 @@
     #endinput
 #endif
 
-native RandomNumber();
-native RandomNumberMax(max);
-native RandomNumberMinMax(min, max);
+native RandomNumber(...);
+
+// native RandomNumberMax(max)
+stock RandomNumberMax(max)
+{
+    return RandomNumber(max);
+}
+
+// native RandomNumberMinMax(min, max);
+stock RandomNumberMinMax(min, max)
+{
+    return RandomNumber(min, max);
+}
