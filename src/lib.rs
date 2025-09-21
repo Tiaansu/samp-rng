@@ -7,6 +7,7 @@ use samp::initialize_plugin;
 initialize_plugin!(
     natives: [
         SampRng::random_number,
+        SampRng::random_float_number,
     ],
     {
         let samp_logger = samp::plugin::logger()
