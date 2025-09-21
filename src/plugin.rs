@@ -5,7 +5,7 @@ pub struct SampRng {}
 
 impl SampPlugin for SampRng {
     fn on_load(&mut self) {
-        info!("Version: 0.0.1");
+        info!("Version: 0.1.1");
     }
 
     fn on_unload(&mut self) {
