@@ -7,6 +7,7 @@
 #endif
 
 native RandomNumber(...);
+native RandomNumberArray(const arr[], size = sizeof arr);
 
 // native RandomNumberMax(max)
 stock RandomNumberMax(max)
@@ -21,6 +22,7 @@ stock RandomNumberMinMax(min, max)
 }
 
 native Float:RandomFloatNumber(Float:...);
+native Float:RandomFloatNumberArray(const Float:arr[], size = sizeof arr);
 
 // native Float:RandomFloatNumberMax(Float:max);
 stock Float:RandomFloatNumberMax(Float:max)
