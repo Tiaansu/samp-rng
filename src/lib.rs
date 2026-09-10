@@ -6,8 +6,12 @@ use samp::initialize_plugin;
 
 initialize_plugin!(
     natives: [
+        // normal
         SampRng::random_number,
         SampRng::random_float_number,
+        // arrays
+        SampRng::random_number_array,
+        SampRng::random_float_number_array,
     ],
     {
         let samp_logger = samp::plugin::logger()

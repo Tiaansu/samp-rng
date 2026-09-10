@@ -4,6 +4,48 @@ use samp::native;
 use samp::prelude::*;
 
 impl super::SampRng {
+    #[native(name = "RandomNumberArray")]
+    pub fn random_number_array(
+        &mut self,
+        _amx: &Amx,
+        array: UnsizedBuffer,
+        size: usize,
+    ) -> AmxResult<i32> {
+        let buf = array.into_sized_buffer(size);
+
+        let mut rng = thread_rng();
+
+        if size == 0 {
+            return Ok(0);
+        } else if size == 1 {
+            return Ok(buf[0]);
+        } else {
+            let num = buf.choose(&mut rng).copied().unwrap();
+            return Ok(num);
+        }
+    }
+
+    #[native(name = "RandomFloatNumberArray")]
+    pub fn random_float_number_array(
+        &mut self,
+        _amx: &Amx,
+        array: UnsizedBuffer,
+        size: usize,
+    ) -> AmxResult<f32> {
+        let buf = array.into_sized_buffer(size);
+
+        let mut rng = thread_rng();
+
+        if size == 0 {
+            return Ok(0.0);
+        } else if size == 1 {
+            return Ok(f32::from_bits(buf[0] as u32));
+        } else {
+            let cell = *buf.choose(&mut rng).unwrap();
+            return Ok(f32::from_bits(cell as u32));
+        }
+    }
+
     #[native(raw, name = "RandomNumber")]
     pub fn random_number(&mut self, _amx: &Amx, mut args: samp::args::Args) -> AmxResult<i32> {
         let mut rng = thread_rng();
